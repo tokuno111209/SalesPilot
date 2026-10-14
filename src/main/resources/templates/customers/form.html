@@ -1,0 +1,472 @@
+
+
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>新規顧客登録 | SalesPilot</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Meiryo", sans-serif;
+            background: #f4f6fa;
+            color: #263238;
+        }
+
+        /* ヘッダー */
+        .header {
+            background: #17365d;
+            color: white;
+            padding: 20px 40px;
+        }
+
+        .header-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo h2 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .logo p {
+            margin: 5px 0 0;
+            color: #cbd5e1;
+            font-size: 12px;
+        }
+
+        /* ナビゲーション */
+        .nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .nav a {
+            color: #e2e8f0;
+            text-decoration: none;
+            padding: 10px 14px;
+            border-radius: 7px;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .nav a:hover,
+        .nav a.active {
+            background: #294d78;
+            color: white;
+        }
+
+        /* メイン */
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* ページタイトル */
+        .page-heading {
+            margin-bottom: 25px;
+        }
+
+        .page-heading h1 {
+            margin: 0 0 10px;
+            color: #17365d;
+            font-size: 27px;
+        }
+
+        .page-heading p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* フォームカード */
+        .card {
+            background: white;
+            padding: 35px;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            box-shadow: 0 3px 12px #00000008;
+        }
+
+        .form-title {
+            margin: 0 0 8px;
+            color: #17365d;
+            font-size: 19px;
+        }
+
+        .form-description {
+            margin: 0 0 28px;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        /* 入力欄 */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 9px;
+            color: #334155;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            background: white;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px #dbeafe;
+        }
+
+        input::placeholder {
+            color: #94a3b8;
+        }
+
+        /* 必須表示 */
+        .required {
+            display: inline-block;
+            margin-left: 7px;
+            padding: 3px 7px;
+            background: #fee2e2;
+            color: #b91c1c;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .optional {
+            display: inline-block;
+            margin-left: 7px;
+            padding: 3px 7px;
+            background: #f1f5f9;
+            color: #64748b;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* 入力補足 */
+        .form-help {
+            margin-top: 7px;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        /* エラーメッセージ */
+        .error-message {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 25px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        /* ボタン */
+        .buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 13px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: background 0.2s;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        /* フッター */
+        .footer {
+            margin-top: 60px;
+            padding: 25px 20px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* スマートフォン */
+        @media (max-width: 600px) {
+            .header {
+                padding: 20px;
+            }
+
+            .header-inner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .nav {
+                width: 100%;
+                gap: 5px;
+            }
+
+            .nav a {
+                padding: 9px 10px;
+                font-size: 12px;
+            }
+
+            .container {
+                margin-top: 25px;
+            }
+
+            .page-heading h1 {
+                font-size: 23px;
+            }
+
+            .card {
+                padding: 22px;
+            }
+
+            .buttons {
+                flex-direction: column-reverse;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .footer {
+                margin-top: 40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ヘッダー -->
+    <header class="header">
+
+        <div class="header-inner">
+
+            <div class="logo">
+                <h2>SalesPilot</h2>
+                <p>営業・顧客管理システム</p>
+            </div>
+
+            <nav class="nav" aria-label="メインメニュー">
+
+                <a th:href="@{/}">
+                    ホーム
+                </a>
+
+                <a th:href="@{/dashboard}">
+                    ダッシュボード
+                </a>
+
+                <a th:href="@{/customers}"
+                   class="active"
+                   aria-current="page">
+                    顧客管理
+                </a>
+
+                <a th:href="@{/deals}">
+                    商談管理
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+    <main class="container">
+
+        <!-- ページタイトル -->
+        <div class="page-heading">
+
+            <h1>新規顧客登録</h1>
+
+            <p>
+                新しい顧客情報を登録します。
+                顧客名は必須項目です。
+            </p>
+
+        </div>
+
+        <!-- 登録フォーム -->
+        <div class="card">
+
+            <h2 class="form-title">
+                顧客情報
+            </h2>
+
+            <p class="form-description">
+                以下の項目を入力してください。
+                会社名・電話番号・メールアドレスは任意です。
+            </p>
+
+            <!-- 入力エラーメッセージ -->
+            <div th:if="${errorMessage}"
+                 class="error-message"
+                 role="alert"
+                 th:text="${errorMessage}">
+            </div>
+
+            <form th:action="@{/customers}"
+                  th:object="${customer}"
+                  method="post">
+
+                <!-- 顧客名 -->
+                <div class="form-group">
+
+                    <label for="name">
+                        顧客名
+                        <span class="required">必須</span>
+                    </label>
+
+                    <input type="text"
+                           id="name"
+                           th:field="*{name}"
+                           placeholder="例：山田 太郎"
+                           maxlength="100"
+                           autocomplete="name"
+                           required>
+
+                    <div class="form-help">
+                        100文字以内で入力してください。
+                    </div>
+
+                </div>
+
+                <!-- 会社名 -->
+                <div class="form-group">
+
+                    <label for="company">
+                        会社名
+                        <span class="optional">任意</span>
+                    </label>
+
+                    <input type="text"
+                           id="company"
+                           th:field="*{company}"
+                           placeholder="例：株式会社サンプル"
+                           maxlength="150"
+                           autocomplete="organization">
+
+                </div>
+
+                <!-- 電話番号 -->
+                <div class="form-group">
+
+                    <label for="phone">
+                        電話番号
+                        <span class="optional">任意</span>
+                    </label>
+
+                    <input type="tel"
+                           id="phone"
+                           th:field="*{phone}"
+                           placeholder="例：09012345678"
+                           maxlength="30"
+                           autocomplete="tel">
+
+                </div>
+
+                <!-- メールアドレス -->
+                <div class="form-group">
+
+                    <label for="email">
+                        メールアドレス
+                        <span class="optional">任意</span>
+                    </label>
+
+                    <input type="email"
+                           id="email"
+                           th:field="*{email}"
+                           placeholder="例：sample@example.com"
+                           maxlength="255"
+                           autocomplete="email">
+
+                </div>
+
+                <!-- 操作ボタン -->
+                <div class="buttons">
+
+                    <a th:href="@{/customers}"
+                       class="btn btn-secondary">
+                        キャンセル
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        顧客を登録する
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </main>
+
+    <!-- フッター -->
+    <footer class="footer">
+        SalesPilot | 営業・顧客管理システム
+    </footer>
+
+</body>
+</html>

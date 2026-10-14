@@ -1,0 +1,546 @@
+
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>商談情報編集 | SalesPilot</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Meiryo", sans-serif;
+            background: #f4f6fa;
+            color: #263238;
+        }
+
+        /* ヘッダー */
+        .header {
+            background: #17365d;
+            color: white;
+            padding: 20px 40px;
+        }
+
+        .header-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo h2 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .logo p {
+            margin: 5px 0 0;
+            color: #cbd5e1;
+            font-size: 12px;
+        }
+
+        /* ナビゲーション */
+        .nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .nav a {
+            color: #e2e8f0;
+            text-decoration: none;
+            padding: 10px 14px;
+            border-radius: 7px;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .nav a:hover,
+        .nav a.active {
+            background: #294d78;
+            color: white;
+        }
+
+        /* メイン */
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* ページタイトル */
+        .page-heading {
+            margin-bottom: 25px;
+        }
+
+        .page-heading h1 {
+            margin: 0 0 10px;
+            color: #17365d;
+            font-size: 27px;
+        }
+
+        .page-heading p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* フォームカード */
+        .card {
+            background: white;
+            padding: 35px;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            box-shadow: 0 3px 12px #00000008;
+        }
+
+        .form-title {
+            margin: 0 0 8px;
+            color: #17365d;
+            font-size: 19px;
+        }
+
+        .form-description {
+            margin: 0 0 28px;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        /* 入力欄 */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 9px;
+            color: #334155;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            background: white;
+            transition: border-color 0.2s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px #dbeafe;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #94a3b8;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* 必須・任意 */
+        .required {
+            display: inline-block;
+            margin-left: 7px;
+            padding: 3px 7px;
+            background: #fee2e2;
+            color: #b91c1c;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .optional {
+            display: inline-block;
+            margin-left: 7px;
+            padding: 3px 7px;
+            background: #f1f5f9;
+            color: #64748b;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* 入力補足 */
+        .form-help {
+            margin-top: 7px;
+            color: #94a3b8;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* エラーメッセージ */
+        .error-message {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 25px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        /* ボタン */
+        .buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 13px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: background 0.2s;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        /* フッター */
+        .footer {
+            margin-top: 60px;
+            padding: 25px 20px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* スマートフォン */
+        @media (max-width: 600px) {
+            .header {
+                padding: 20px;
+            }
+
+            .header-inner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .nav {
+                width: 100%;
+                gap: 5px;
+            }
+
+            .nav a {
+                padding: 9px 10px;
+                font-size: 12px;
+            }
+
+            .container {
+                margin-top: 25px;
+            }
+
+            .page-heading h1 {
+                font-size: 23px;
+            }
+
+            .card {
+                padding: 22px;
+            }
+
+            .buttons {
+                flex-direction: column-reverse;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .footer {
+                margin-top: 40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ヘッダー -->
+    <header class="header">
+
+        <div class="header-inner">
+
+            <div class="logo">
+                <h2>SalesPilot</h2>
+                <p>営業・顧客管理システム</p>
+            </div>
+
+            <nav class="nav" aria-label="メインメニュー">
+
+                <a th:href="@{/}">
+                    ホーム
+                </a>
+
+                <a th:href="@{/dashboard}">
+                    ダッシュボード
+                </a>
+
+                <a th:href="@{/customers}">
+                    顧客管理
+                </a>
+
+                <a th:href="@{/deals}"
+                   class="active"
+                   aria-current="page">
+                    商談管理
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+    <main class="container">
+
+        <!-- ページタイトル -->
+        <div class="page-heading">
+
+            <h1>商談情報編集</h1>
+
+            <p>
+                登録済みの商談情報を変更できます。
+                編集後は「変更を保存する」を押してください。
+            </p>
+
+        </div>
+
+        <!-- 編集フォーム -->
+        <div class="card">
+
+            <h2 class="form-title">
+                商談情報
+            </h2>
+
+            <p class="form-description">
+                変更したい項目を編集してください。
+                商談名・顧客・進捗状況は必須項目です。
+            </p>
+
+            <!-- 入力エラーメッセージ -->
+            <div th:if="${errorMessage}"
+                 class="error-message"
+                 role="alert"
+                 th:text="${errorMessage}">
+            </div>
+
+            <form th:action="@{/deals/{id}/edit(id=${deal.id})}"
+                  th:object="${deal}"
+                  method="post">
+
+                <!-- 商談名 -->
+                <div class="form-group">
+
+                    <label for="title">
+                        商談名
+                        <span class="required">必須</span>
+                    </label>
+
+                    <input type="text"
+                           id="title"
+                           th:field="*{title}"
+                           placeholder="例：Webサイト制作の提案"
+                           required>
+
+                </div>
+
+                <!-- 顧客選択 -->
+                <div class="form-group">
+
+                    <label for="customerId">
+                        顧客
+                        <span class="required">必須</span>
+                    </label>
+
+                    <select id="customerId"
+                            name="customerId"
+                            required>
+
+                        <option value="">
+                            顧客を選択してください
+                        </option>
+
+                        <!-- 登録済みの顧客を初期選択 -->
+                        <option
+                            th:each="customer : ${customers}"
+                            th:value="${customer.id}"
+                            th:text="${customer.name + '（' + (customer.company != null ? customer.company : '') + '）'}"
+                            th:selected="${deal.customer != null and deal.customer.id == customer.id}">
+                        </option>
+
+                    </select>
+
+                    <div class="form-help">
+                        この商談を紐づける顧客を選択してください。
+                    </div>
+
+                </div>
+
+                <!-- 商談金額 -->
+                <div class="form-group">
+
+                    <label for="amount">
+                        商談金額（円）
+                        <span class="optional">任意</span>
+                    </label>
+
+                    <input type="number"
+                           id="amount"
+                           th:field="*{amount}"
+                           min="0"
+                           step="1"
+                           placeholder="例：300000">
+
+                    <div class="form-help">
+                        0円以上の整数で入力してください。
+                    </div>
+
+                </div>
+
+                <!-- 進捗状況 -->
+                <div class="form-group">
+
+                    <label for="status">
+                        進捗状況
+                        <span class="required">必須</span>
+                    </label>
+
+                    <select id="status"
+                            th:field="*{status}"
+                            required>
+
+                        <option value="">
+                            選択してください
+                        </option>
+
+                        <option value="提案中">
+                            提案中
+                        </option>
+
+                        <option value="見積提出">
+                            見積提出
+                        </option>
+
+                        <option value="受注">
+                            受注
+                        </option>
+
+                        <option value="失注">
+                            失注
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- 商談予定日 -->
+                <div class="form-group">
+
+                    <label for="scheduledDate">
+                        商談予定日
+                        <span class="optional">任意</span>
+                    </label>
+
+                    <input type="date"
+                           id="scheduledDate"
+                           th:field="*{scheduledDate}">
+
+                </div>
+
+                <!-- メモ -->
+                <div class="form-group">
+
+                    <label for="memo">
+                        メモ
+                        <span class="optional">任意</span>
+                    </label>
+
+                    <textarea id="memo"
+                              th:field="*{memo}"
+                              placeholder="商談内容や次回の対応予定など"></textarea>
+
+                    <div class="form-help">
+                        商談内容や次回の対応予定を記録できます。
+                    </div>
+
+                </div>
+
+                <!-- 操作ボタン -->
+                <div class="buttons">
+
+                    <a th:href="@{/deals}"
+                       class="btn btn-secondary">
+                        キャンセル
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        変更を保存する
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </main>
+
+    <!-- フッター -->
+    <footer class="footer">
+        SalesPilot | 営業・顧客管理システム
+    </footer>
+
+</body>
+</html>

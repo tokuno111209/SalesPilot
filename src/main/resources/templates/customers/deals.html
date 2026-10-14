@@ -1,0 +1,605 @@
+
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>顧客別商談履歴 | SalesPilot</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Meiryo", sans-serif;
+            background: #f4f6fa;
+            color: #263238;
+        }
+
+        /* ヘッダー */
+        .header {
+            background: #17365d;
+            color: white;
+            padding: 20px 40px;
+        }
+
+        .header-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo h2 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .logo p {
+            margin: 5px 0 0;
+            color: #cbd5e1;
+            font-size: 12px;
+        }
+
+        /* ナビゲーション */
+        .nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .nav a {
+            color: #e2e8f0;
+            text-decoration: none;
+            padding: 10px 14px;
+            border-radius: 7px;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .nav a:hover,
+        .nav a.active {
+            background: #294d78;
+            color: white;
+        }
+
+        /* メイン */
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* ページヘッダー */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .page-header h1 {
+            margin: 0 0 10px;
+            color: #17365d;
+            font-size: 27px;
+        }
+
+        .page-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* カード */
+        .card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 28px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 12px #00000008;
+        }
+
+        .card-title {
+            margin: 0 0 25px;
+            color: #17365d;
+            font-size: 20px;
+        }
+
+        /* 顧客情報 */
+        .customer-info {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 24px;
+        }
+
+        .info-item {
+            min-width: 0;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 9px;
+        }
+
+        .info-label {
+            color: #64748b;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            color: #1e293b;
+            font-size: 16px;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        /* ボタン */
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            font-family: inherit;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-edit {
+            background: #059669;
+            color: white;
+            padding: 8px 16px;
+            white-space: nowrap;
+        }
+
+        .btn-edit:hover {
+            background: #047857;
+        }
+
+        /* 商談履歴ヘッダー */
+        .deal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .deal-header h2 {
+            margin: 0;
+            color: #17365d;
+            font-size: 20px;
+        }
+
+        /* テーブル */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 750px;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #eef2f7;
+            color: #475569;
+            text-align: left;
+            padding: 15px;
+            font-size: 13px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 16px 15px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        tbody tr:hover td {
+            background: #f8fafc;
+        }
+
+        .deal-title {
+            font-weight: bold;
+            color: #1e293b;
+        }
+
+        .amount {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        /* 進捗状況 */
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .status-proposing {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .status-estimate {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-won {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-lost {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* データなし */
+        .empty {
+            text-align: center;
+            color: #64748b;
+            padding: 45px 20px;
+            line-height: 1.8;
+        }
+
+        /* フッター */
+        .footer {
+            margin-top: 60px;
+            padding: 25px 20px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* スマートフォン */
+        @media (max-width: 600px) {
+            .header {
+                padding: 20px;
+            }
+
+            .header-inner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .nav {
+                width: 100%;
+                gap: 5px;
+            }
+
+            .nav a {
+                padding: 9px 10px;
+                font-size: 12px;
+            }
+
+            .container {
+                margin-top: 25px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .page-header h1 {
+                font-size: 23px;
+            }
+
+            .buttons {
+                width: 100%;
+            }
+
+            .buttons .btn {
+                flex: 1;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .customer-info {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .deal-header {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .deal-header .btn {
+                width: 100%;
+            }
+
+            .footer {
+                margin-top: 40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ヘッダー -->
+    <header class="header">
+
+        <div class="header-inner">
+
+            <div class="logo">
+                <h2>SalesPilot</h2>
+                <p>営業・顧客管理システム</p>
+            </div>
+
+            <nav class="nav" aria-label="メインメニュー">
+
+                <a th:href="@{/}">
+                    ホーム
+                </a>
+
+                <a th:href="@{/dashboard}">
+                    ダッシュボード
+                </a>
+
+                <a th:href="@{/customers}"
+                   class="active"
+                   aria-current="page">
+                    顧客管理
+                </a>
+
+                <a th:href="@{/deals}">
+                    商談管理
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+    <main class="container">
+
+        <!-- ページタイトル -->
+        <div class="page-header">
+
+            <div>
+                <h1>顧客別商談履歴</h1>
+                <p>
+                    顧客情報と、その顧客に紐づく商談を確認できます。
+                </p>
+            </div>
+
+            <div class="buttons">
+
+                <!-- 顧客一覧へ戻る -->
+                <a th:href="@{/customers}"
+                   class="btn btn-secondary">
+                    ← 顧客一覧へ戻る
+                </a>
+
+                <!-- トップページへ戻る -->
+                <a th:href="@{/}"
+                   class="btn btn-secondary">
+                    トップページへ戻る
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- 顧客情報カード -->
+        <section class="card">
+
+            <h2 class="card-title">
+                顧客情報
+            </h2>
+
+            <div class="customer-info">
+
+                <!-- 顧客名 -->
+                <div class="info-item">
+
+                    <div class="info-label">
+                        顧客名
+                    </div>
+
+                    <div class="info-value"
+                         th:text="${customer.name}">
+                    </div>
+
+                </div>
+
+                <!-- 会社名 -->
+                <div class="info-item">
+
+                    <div class="info-label">
+                        会社名
+                    </div>
+
+                    <div class="info-value"
+                         th:text="${customer.company != null and !#strings.isEmpty(customer.company) ? customer.company : '-'}">
+                    </div>
+
+                </div>
+
+                <!-- 電話番号 -->
+                <div class="info-item">
+
+                    <div class="info-label">
+                        電話番号
+                    </div>
+
+                    <div class="info-value"
+                         th:text="${customer.phone != null and !#strings.isEmpty(customer.phone) ? customer.phone : '-'}">
+                    </div>
+
+                </div>
+
+                <!-- メールアドレス -->
+                <div class="info-item">
+
+                    <div class="info-label">
+                        メールアドレス
+                    </div>
+
+                    <div class="info-value"
+                         th:text="${customer.email != null and !#strings.isEmpty(customer.email) ? customer.email : '-'}">
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- 商談履歴カード -->
+        <section class="card">
+
+            <div class="deal-header">
+
+                <h2>商談履歴</h2>
+
+                <!-- 顧客IDを引き継いで商談登録 -->
+                <a th:href="@{/deals/new(customerId=${customer.id})}"
+                   class="btn btn-primary">
+                    ＋ この顧客の商談を登録
+                </a>
+
+            </div>
+
+            <!-- テーブル -->
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">商談名</th>
+                            <th scope="col">商談金額</th>
+                            <th scope="col">進捗状況</th>
+                            <th scope="col">商談予定日</th>
+                            <th scope="col">操作</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <!-- 商談データ -->
+                        <tr th:each="deal : ${deals}">
+
+                            <td th:text="${deal.id}">
+                            </td>
+
+                            <td class="deal-title"
+                                th:text="${deal.title}">
+                            </td>
+
+                            <td class="amount"
+                                th:text="${deal.amount != null
+                                    ? #numbers.formatDecimal(
+                                        deal.amount, 1, 'COMMA', 0, 'POINT') + '円'
+                                    : '-'}">
+                            </td>
+
+                            <td>
+                                <span class="status"
+                                      th:classappend="${deal.status == '提案中' ? 'status-proposing' :
+                                          (deal.status == '見積提出' ? 'status-estimate' :
+                                          (deal.status == '受注' ? 'status-won' :
+                                          (deal.status == '失注' ? 'status-lost' : '')))}"
+                                      th:text="${deal.status}">
+                                </span>
+                            </td>
+
+                            <td th:text="${deal.scheduledDate != null
+                                ? #temporals.format(
+                                    deal.scheduledDate, 'yyyy/MM/dd')
+                                : '-'}">
+                            </td>
+
+                            <td>
+                                <a th:href="@{/deals/{id}/edit(id=${deal.id})}"
+                                   class="btn btn-edit">
+                                    編集
+                                </a>
+                            </td>
+
+                        </tr>
+
+                        <!-- 商談がない場合 -->
+                        <tr th:if="${#lists.isEmpty(deals)}">
+
+                            <td colspan="6" class="empty">
+                                この顧客の商談はまだ登録されていません。
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- フッター -->
+    <footer class="footer">
+        SalesPilot | 営業・顧客管理システム
+    </footer>
+
+</body>
+</html>

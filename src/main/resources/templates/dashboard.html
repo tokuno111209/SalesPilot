@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>ダッシュボード | SalesPilot</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Meiryo", sans-serif;
+            background: #f4f6fa;
+            color: #263238;
+        }
+
+        /* ヘッダー */
+        .header {
+            background: #17365d;
+            color: white;
+            padding: 20px 40px;
+        }
+
+        .header-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo h2 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .logo p {
+            margin: 5px 0 0;
+            color: #cbd5e1;
+            font-size: 12px;
+        }
+
+        /* ナビゲーション */
+        .nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .nav a {
+            color: #e2e8f0;
+            text-decoration: none;
+            padding: 10px 14px;
+            border-radius: 7px;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .nav a:hover,
+        .nav a.active {
+            background: #294d78;
+            color: white;
+        }
+
+        /* メイン */
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-heading {
+            margin-bottom: 30px;
+        }
+
+        .page-heading h1 {
+            margin: 0 0 10px;
+            font-size: 27px;
+            color: #17365d;
+        }
+
+        .page-heading p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* 集計カード */
+        .cards {
+            display: grid;
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 3px 12px #00000008;
+            min-width: 0;
+        }
+
+        .card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .card-label {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .card-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+            flex-shrink: 0;
+        }
+
+        .icon-customer {
+            background: #dbeafe;
+        }
+
+        .icon-deal {
+            background: #fef3c7;
+        }
+
+        .icon-won {
+            background: #dcfce7;
+        }
+
+        .icon-amount {
+            background: #ede9fe;
+        }
+
+        .card-value {
+            color: #17365d;
+            font-size: 31px;
+            font-weight: bold;
+            line-height: 1.4;
+            overflow-wrap: anywhere;
+        }
+
+        .card-value.amount {
+            font-size: 27px;
+        }
+
+        .card-unit {
+            font-size: 14px;
+            margin-left: 4px;
+            font-weight: normal;
+        }
+
+        /* セクション */
+        .section {
+            margin-top: 35px;
+        }
+
+        .section-heading {
+            margin-bottom: 20px;
+        }
+
+        .section-heading h2 {
+            margin: 0 0 8px;
+            font-size: 21px;
+            color: #17365d;
+        }
+
+        .section-heading p {
+            margin: 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        /* ステータス別グラフ */
+        .chart-card {
+            background: white;
+            border-radius: 14px;
+            padding: 30px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 3px 12px #00000008;
+        }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: 100px minmax(0, 1fr) 55px;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .chart-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .chart-label {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .dot-proposing {
+            background: #2563eb;
+        }
+
+        .dot-estimate {
+            background: #f59e0b;
+        }
+
+        .dot-won {
+            background: #059669;
+        }
+
+        .dot-lost {
+            background: #dc2626;
+        }
+
+        .chart-track {
+            height: 22px;
+            background: #eef2f7;
+            border-radius: 7px;
+            overflow: hidden;
+        }
+
+        .chart-bar {
+            height: 100%;
+            border-radius: 7px;
+            transition: width 0.3s ease;
+        }
+
+        .bar-proposing {
+            background: #2563eb;
+        }
+
+        .bar-estimate {
+            background: #f59e0b;
+        }
+
+        .bar-won {
+            background: #059669;
+        }
+
+        .bar-lost {
+            background: #dc2626;
+        }
+
+        .chart-count {
+            text-align: right;
+            font-size: 14px;
+            font-weight: bold;
+            color: #334155;
+        }
+
+        /* 管理メニュー */
+        .menu {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 13px 22px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+            text-align: center;
+            transition: background 0.2s;
+        }
+
+        .btn-customer {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-customer:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-deals {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-deals:hover {
+            background: #047857;
+        }
+
+        .btn-home {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-home:hover {
+            background: #475569;
+        }
+
+        /* フッター */
+        .footer {
+            margin-top: 60px;
+            padding: 25px 20px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* タブレット */
+        @media (max-width: 1000px) {
+            .cards {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        /* スマートフォン */
+        @media (max-width: 600px) {
+            .header {
+                padding: 20px;
+            }
+
+            .header-inner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .nav {
+                width: 100%;
+                gap: 5px;
+            }
+
+            .nav a {
+                padding: 9px 10px;
+                font-size: 12px;
+            }
+
+            .container {
+                margin-top: 25px;
+            }
+
+            .page-heading h1 {
+                font-size: 23px;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 22px;
+            }
+
+            .chart-card {
+                padding: 20px;
+            }
+
+            .chart-row {
+                grid-template-columns:
+                    80px minmax(0, 1fr) 40px;
+                gap: 8px;
+            }
+
+            .chart-label {
+                gap: 5px;
+                font-size: 12px;
+            }
+
+            .chart-count {
+                font-size: 12px;
+            }
+
+            .menu {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .footer {
+                margin-top: 40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ヘッダー -->
+    <header class="header">
+
+        <div class="header-inner">
+
+            <div class="logo">
+                <h2>SalesPilot</h2>
+                <p>営業・顧客管理システム</p>
+            </div>
+
+            <!-- ナビゲーション -->
+            <nav class="nav" aria-label="メインメニュー">
+
+                <a th:href="@{/}">
+                    ホーム
+                </a>
+
+                <a th:href="@{/dashboard}"
+                   class="active"
+                   aria-current="page">
+                    ダッシュボード
+                </a>
+
+                <a th:href="@{/customers}">
+                    顧客管理
+                </a>
+
+                <a th:href="@{/deals}">
+                    商談管理
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+    <main class="container">
+
+        <!-- ページタイトル -->
+        <div class="page-heading">
+
+            <h1>営業ダッシュボード</h1>
+
+            <p>
+                顧客情報・商談状況・受注実績を
+                まとめて確認できます。
+            </p>
+
+        </div>
+
+        <!-- 集計カード -->
+        <section class="cards">
+
+            <!-- 登録顧客数 -->
+            <div class="card">
+
+                <div class="card-top">
+
+                    <span class="card-label">
+                        登録顧客数
+                    </span>
+
+                    <span class="card-icon icon-customer">
+                        👥
+                    </span>
+
+                </div>
+
+                <div class="card-value">
+                    <span th:text="${customerCount}">0</span>
+                    <span class="card-unit">件</span>
+                </div>
+
+            </div>
+
+            <!-- 商談件数 -->
+            <div class="card">
+
+                <div class="card-top">
+
+                    <span class="card-label">
+                        商談件数
+                    </span>
+
+                    <span class="card-icon icon-deal">
+                        🤝
+                    </span>
+
+                </div>
+
+                <div class="card-value">
+                    <span th:text="${dealCount}">0</span>
+                    <span class="card-unit">件</span>
+                </div>
+
+            </div>
+
+            <!-- 受注件数 -->
+            <div class="card">
+
+                <div class="card-top">
+
+                    <span class="card-label">
+                        受注件数
+                    </span>
+
+                    <span class="card-icon icon-won">
+                        ✓
+                    </span>
+
+                </div>
+
+                <div class="card-value">
+                    <span th:text="${wonCount}">0</span>
+                    <span class="card-unit">件</span>
+                </div>
+
+            </div>
+
+            <!-- 受注金額 -->
+            <div class="card">
+
+                <div class="card-top">
+
+                    <span class="card-label">
+                        受注金額
+                    </span>
+
+                    <span class="card-icon icon-amount">
+                        ¥
+                    </span>
+
+                </div>
+
+                <div class="card-value amount">
+
+                    <span th:text="${#numbers.formatDecimal(
+                        wonAmount, 1, 'COMMA', 0, 'POINT')}">
+                        0
+                    </span>
+
+                    <span class="card-unit">円</span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- 商談ステータス別グラフ -->
+        <section class="section">
+
+            <div class="section-heading">
+
+                <h2>商談ステータス別件数</h2>
+
+                <p>
+                    登録されている商談の進捗状況を
+                    件数と割合で確認できます。
+                </p>
+
+            </div>
+
+            <div class="chart-card">
+
+                <!-- 提案中 -->
+                <div class="chart-row">
+
+                    <div class="chart-label">
+                        <span class="status-dot dot-proposing"></span>
+                        提案中
+                    </div>
+
+                    <div class="chart-track">
+                        <div class="chart-bar bar-proposing"
+                             th:style="|width: ${dealCount > 0
+                                 ? proposingCount * 100.0 / dealCount
+                                 : 0}%;|">
+                        </div>
+                    </div>
+
+                    <div class="chart-count"
+                         th:text="|${proposingCount}件|">
+                        0件
+                    </div>
+
+                </div>
+
+                <!-- 見積提出 -->
+                <div class="chart-row">
+
+                    <div class="chart-label">
+                        <span class="status-dot dot-estimate"></span>
+                        見積提出
+                    </div>
+
+                    <div class="chart-track">
+                        <div class="chart-bar bar-estimate"
+                             th:style="|width: ${dealCount > 0
+                                 ? estimateCount * 100.0 / dealCount
+                                 : 0}%;|">
+                        </div>
+                    </div>
+
+                    <div class="chart-count"
+                         th:text="|${estimateCount}件|">
+                        0件
+                    </div>
+
+                </div>
+
+                <!-- 受注 -->
+                <div class="chart-row">
+
+                    <div class="chart-label">
+                        <span class="status-dot dot-won"></span>
+                        受注
+                    </div>
+
+                    <div class="chart-track">
+                        <div class="chart-bar bar-won"
+                             th:style="|width: ${dealCount > 0
+                                 ? wonCount * 100.0 / dealCount
+                                 : 0}%;|">
+                        </div>
+                    </div>
+
+                    <div class="chart-count"
+                         th:text="|${wonCount}件|">
+                        0件
+                    </div>
+
+                </div>
+
+                <!-- 失注 -->
+                <div class="chart-row">
+
+                    <div class="chart-label">
+                        <span class="status-dot dot-lost"></span>
+                        失注
+                    </div>
+
+                    <div class="chart-track">
+                        <div class="chart-bar bar-lost"
+                             th:style="|width: ${dealCount > 0
+                                 ? lostCount * 100.0 / dealCount
+                                 : 0}%;|">
+                        </div>
+                    </div>
+
+                    <div class="chart-count"
+                         th:text="|${lostCount}件|">
+                        0件
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- 管理メニュー -->
+        <section class="section">
+
+            <div class="section-heading">
+                <h2>管理メニュー</h2>
+                <p>各管理画面へ移動できます。</p>
+            </div>
+
+            <div class="menu">
+
+                <a th:href="@{/customers}"
+                   class="btn btn-customer">
+                    顧客管理へ
+                </a>
+
+                <a th:href="@{/deals}"
+                   class="btn btn-deals">
+                    商談管理へ
+                </a>
+
+                <a th:href="@{/}"
+                   class="btn btn-home">
+                    ← トップページへ戻る
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- フッター -->
+    <footer class="footer">
+        SalesPilot | 営業・顧客管理システム
+    </footer>
+
+</body>
+</html>
